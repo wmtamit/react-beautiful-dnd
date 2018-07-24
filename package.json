@@ -29,6 +29,8 @@
   },
   "scripts": {
     "test": "jest --config ./jest.config.js",
+    "test:cypress": "cypress run --spec ./cypress/integration/simple-vertical-list.spec.js",
+    "test:cypress-watch": "node ./node_modules/.bin/cypress open",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
@@ -76,6 +78,7 @@
     "babel-plugin-dev-expression": "^0.2.1",
     "babel-plugin-styled-components": "^1.5.1",
     "cross-env": "^5.2.0",
+    "cypress": "^3.0.2",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "eslint": "^5.0.1",
