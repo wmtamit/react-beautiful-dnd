@@ -35,6 +35,7 @@ import {
   updateDroppableIsEnabled,
   collectionStarting,
 } from '../../state/action-creators';
+import StoreContext from '../store-provider/store-context';
 
 type Props = {|
   ...Hooks,
@@ -105,6 +106,11 @@ export default class DragDropContext extends React.Component<Props> {
       announce: this.announcer.announce,
       getScroller: () => this.autoScroller,
     });
+
+    // this.store.subscribe(() => {
+    //   console.log('update', this.store.getState());
+    // });
+
     const callbacks: DimensionMarshalCallbacks = bindActionCreators(
       {
         publish,
@@ -201,6 +207,10 @@ export default class DragDropContext extends React.Component<Props> {
   onWindowError = (error: Error) => this.onFatalError(error);
 
   render() {
-    return this.props.children;
+    return (
+      <StoreContext.Provider value={this.store}>
+        {this.props.children}
+      </StoreContext.Provider>
+    );
   }
 }

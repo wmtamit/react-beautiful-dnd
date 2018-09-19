@@ -1,2 +1,2 @@
 // @flow
-export { default } from './connected-draggable';
+export { default } from './context-draggable';

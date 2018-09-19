@@ -22,6 +22,7 @@ class Item extends React.Component<ItemProps> {
   render() {
     this.props.onRender();
     const provided: DraggableProvided = this.props.provided;
+    console.log('item render');
     return (
       <div
         className="drag-handle"

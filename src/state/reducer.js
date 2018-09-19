@@ -183,7 +183,6 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    console.log('trying to update droppable scroll');
     const updated: DroppableDimension = scrollDroppable(target, offset);
 
     const dimensions: DimensionMap = {

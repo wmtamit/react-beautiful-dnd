@@ -1,25 +1,9 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { type Node } from 'react';
 import memoizeOne from 'memoize-one';
-import { connect } from 'react-redux';
-import Draggable from './draggable';
-import { storeKey } from '../context-keys';
 import { origin } from '../../state/position';
-import isStrictEqual from '../is-strict-equal';
 // reaching into view :(
 import { curves } from '../animation';
-import {
-  lift as liftAction,
-  move as moveAction,
-  moveUp as moveUpAction,
-  moveDown as moveDownAction,
-  moveLeft as moveLeftAction,
-  moveRight as moveRightAction,
-  drop as dropAction,
-  dropAnimationFinished as dropAnimationFinishedAction,
-  moveByWindowScroll as moveByWindowScrollAction,
-} from '../../state/action-creators';
 import type {
   State,
   DraggableId,
@@ -33,13 +17,7 @@ import type {
   DisplacementMap,
   DropReason,
 } from '../../types';
-import type {
-  MapProps,
-  OwnProps,
-  DefaultProps,
-  DispatchProps,
-  Selector,
-} from './draggable-types';
+import type { MapProps, OwnProps, Selector } from './draggable-types';
 
 const defaultMapProps: MapProps = {
   isDragging: false,
@@ -56,9 +34,7 @@ const defaultMapProps: MapProps = {
   combineTargetFor: null,
 };
 
-// Returning a function to ensure each
-// Draggable gets its own selector
-export const makeMapStateToProps = (): Selector => {
+export default (): Selector => {
   const memoizedOffset = memoizeOne(
     (x: number, y: number): Position => ({ x, y }),
   );
@@ -139,8 +115,6 @@ export const makeMapStateToProps = (): Selector => {
   };
 
   const draggingSelector = (state: State, ownProps: OwnProps): ?MapProps => {
-    console.log('CONNECTED-DRAGGABLE: selector');
-
     // Dragging
     if (state.isDragging) {
       // not the dragging item
@@ -252,47 +226,3 @@ export const makeMapStateToProps = (): Selector => {
 
   return selector;
 };
-
-const mapDispatchToProps: DispatchProps = {
-  lift: liftAction,
-  move: moveAction,
-  moveUp: moveUpAction,
-  moveDown: moveDownAction,
-  moveLeft: moveLeftAction,
-  moveRight: moveRightAction,
-  moveByWindowScroll: moveByWindowScrollAction,
-  drop: dropAction,
-  dropAnimationFinished: dropAnimationFinishedAction,
-};
-
-// Leaning heavily on the default shallow equality checking
-// that `connect` provides.
-// It avoids needing to do it own within `Draggable`
-const ConnectedDraggable: OwnProps => Node = (connect(
-  // returning a function so each component can do its own memoization
-  makeMapStateToProps,
-  (mapDispatchToProps: any),
-  // mergeProps: use default
-  null,
-  // options
-  {
-    // Using our own store key.
-    // This allows consumers to also use redux
-    // Note: the default store key is 'store'
-    storeKey,
-    // Default value, but being really clear
-    pure: true,
-    // When pure, compares the result of mapStateToProps to its previous value.
-    // Default value: shallowEqual
-    // Switching to a strictEqual as we return a memoized object on changes
-    areStatePropsEqual: isStrictEqual,
-  },
-): any)(Draggable);
-
-ConnectedDraggable.defaultProps = ({
-  isDragDisabled: false,
-  // cannot drag interactive elements by default
-  disableInteractiveElementBlocking: false,
-}: DefaultProps);
-
-export default ConnectedDraggable;
