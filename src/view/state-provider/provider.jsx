@@ -15,7 +15,7 @@ class Blocker extends React.Component<BlockerProps> {
     if (props.shouldAllow) {
       return true;
     }
-    console.log('not rendering root');
+    console.log('not rendering tree');
     return false;
   }
 
@@ -103,6 +103,7 @@ export default class Provider extends React.Component<
       this.state.appState,
       this.props.store.dispatch,
     );
+
     const shouldAllow: boolean = this.state.shouldRenderChildren;
     return (
       <StateContext.Provider value={value}>

@@ -26,7 +26,7 @@ import {
   moveByWindowScroll as moveByWindowScrollAction,
 } from '../../state/action-creators';
 
-export default class ContextDraggable extends React.PureComponent<OwnProps> {
+class ContextDraggable extends React.Component<OwnProps> {
   selector: Selector = getSelector();
 
   static defaultProps: DefaultProps = {
@@ -65,16 +65,29 @@ export default class ContextDraggable extends React.PureComponent<OwnProps> {
       ...mapProps,
     };
 
-    console.log('Query rendering Draggable');
+    console.warn('ContextDraggable: rendering child (UnconnectedDraggable)');
     return <Draggable {...props}>{this.props.children}</Draggable>;
   };
 
   render() {
-    console.log('rendering ContextDraggable');
+    console.error('ContextDraggable: render() called');
     return (
       <Query selector={this.selector} ownProps={this.props}>
         {this.renderChildren}
       </Query>
+    );
+  }
+}
+
+export default class Debug extends React.Component {
+  shouldComponentUpdate() {
+    console.log('DEBUG: YOU SHALL NOT PASS');
+    return false;
+  }
+  render() {
+    console.error('DEBUG: render() (parent of ContextDraggable)');
+    return (
+      <ContextDraggable {...this.props}>{this.props.children}</ContextDraggable>
     );
   }
 }

@@ -28,11 +28,12 @@ export default class ContextDroppable extends React.Component<OwnProps> {
       ...mapProps,
     };
 
-    console.warn('rendering droppable');
+    console.warn('ContextDroppable: child rendering (UnconnectedDroppable)');
     return <Droppable {...props}>{this.props.children}</Droppable>;
   };
 
   render() {
+    console.error('ContextDroppable: render() called');
     return (
       <Query selector={this.selector} ownProps={this.props}>
         {this.renderChildren}

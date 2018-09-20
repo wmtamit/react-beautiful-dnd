@@ -27,7 +27,7 @@ type QueryState = {|
 // want to render if: a parent is rendering
 // or if the selector returns a new value
 
-class Query extends React.Component<QueryProps, QueryState> {
+class GetMapProps extends React.Component<QueryProps, QueryState> {
   state: QueryState = {
     hasMapPropsChanged: false,
     mapProps: this.props.selector(this.props.value.state, this.props.ownProps),
@@ -44,43 +44,53 @@ class Query extends React.Component<QueryProps, QueryState> {
   }
 
   shouldComponentUpdate(props: QueryProps, state: QueryState) {
-    if (props.isParentRender) {
-      return true;
-    }
+    // TODO: turn back on
+    // if (props.isParentRender) {
+    //   console.log('is parent render');
+    //   return true;
+    // }
 
     if (state.hasMapPropsChanged) {
+      console.log('map props changed', state.mapProps);
       return true;
     }
 
+    console.log('NO map prop change: should not render children');
     return false;
   }
 
   render() {
+    console.warn(
+      'GetMapProps: render() called (responding to state change)',
+      this.props.ownProps,
+    );
     return this.props.children(this.state.mapProps, this.props.value.dispatch);
   }
 }
 
-export default class QueryListener extends React.Component<ListenerProps> {
+export default class Query extends React.Component<ListenerProps> {
   isParentRender: boolean = true;
 
   componentDidUpdate() {
-    console.warn('parent render now false');
     this.isParentRender = false;
   }
   render() {
     this.isParentRender = true;
-    console.log('QueryListener render');
+    console.error(
+      'Query: render() called (parent render)',
+      this.props.ownProps,
+    );
     return (
       <StateContext.Consumer>
         {(value: Value) => (
           // console.log('what is parent render?', this.isParentRender);
-          <Query
+          <GetMapProps
             value={value}
             isParentRender={this.isParentRender}
             {...this.props}
           >
             {this.props.children}
-          </Query>
+          </GetMapProps>
         )}
       </StateContext.Consumer>
     );
