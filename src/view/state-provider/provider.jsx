@@ -7,15 +7,15 @@ import StateContext, { type Value } from './state-context';
 
 type BlockerProps = {|
   children: Node,
-  shouldBlock: boolean,
+  shouldAllow: boolean,
 |};
 
 class Blocker extends React.Component<BlockerProps> {
   shouldComponentUpdate(props: BlockerProps) {
-    if (props.shouldBlock) {
-      console.log('blocking update caused by app state update');
-      return false;
+    if (props.shouldAllow) {
+      return true;
     }
+    console.log('blocking update');
     return true;
   }
 
@@ -30,8 +30,9 @@ type ProviderProps = {|
 |};
 
 type ProviderState = {|
+  lastAppState: AppState,
   appState: AppState,
-  isAppStateRender: boolean,
+  shouldRenderChildren: boolean,
 |};
 
 export default class Provider extends React.Component<
@@ -47,19 +48,25 @@ export default class Provider extends React.Component<
     this.unsubscribe = props.store.subscribe(this.onStateChange);
     this.state = {
       appState: { phase: 'IDLE' },
-      isAppStateRender: false,
+      lastAppState: { phase: 'IDLE' },
+      shouldRenderChildren: true,
     };
   }
 
   static getDerivedStateFromProps(props: ProviderProps, state: ProviderState) {
-    if (state.isAppStateRender) {
-      return state;
+    // render must have been caused by parent
+    if (state.appState === state.lastAppState) {
+      return {
+        ...state,
+        shouldRender: true,
+      };
     }
 
-    // render was caused by parent
+    // app state change - want to block rendering the tree
     return {
-      appState: state.appState,
-      isAppStateRender: false,
+      ...state,
+      lastAppState: state.appState,
+      shouldRenderChildren: false,
     };
   }
 
@@ -75,9 +82,12 @@ export default class Provider extends React.Component<
   onStateChange = () => {
     const appState: AppState = this.props.store.getState();
 
+    if (appState === this.state.appState) {
+      return;
+    }
+
     this.setState({
       appState,
-      isAppStateRender: true,
     });
   };
 
@@ -86,10 +96,10 @@ export default class Provider extends React.Component<
       this.state.appState,
       this.props.store.dispatch,
     );
-    const shouldBlock: boolean = this.state.isAppStateRender;
+    const shouldAllow: boolean = this.state.shouldRenderChildren;
     return (
       <StateContext.Provider value={value}>
-        <Blocker shouldBlock={shouldBlock}>{this.props.children}</Blocker>
+        <Blocker shouldAllow={shouldAllow}>{this.props.children}</Blocker>
       </StateContext.Provider>
     );
   }
