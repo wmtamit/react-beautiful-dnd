@@ -6,7 +6,7 @@ import StateContext, { type Value } from './state-context';
 
 type ListenerProps = {|
   children: (mapProps: mixed, dispatch?: Dispatch) => Node,
-  selector: <MapProps, OwnProps>(state: State, ownProps: OwnProps) => MapProps,
+  selector: (state: State, ownProps: mixed) => mixed,
   ownProps: mixed,
 |};
 
@@ -29,6 +29,13 @@ type QueryState = {|
 // or if the selector returns a new value
 
 class Query extends React.Component<QueryProps, QueryState> {
+  state: QueryState = {
+    hasMapPropsChanged: false,
+    isParentRender: true,
+    lastValue: this.props.value,
+    mapProps: this.props.selector(this.props.value.state, this.props.ownProps),
+  };
+
   static getDerivedStateFromProps(props: QueryProps, state: QueryState) {
     const isParentRender: boolean = props.value === state.lastValue;
     const mapProps = props.selector(props.value.state, props.ownProps);
@@ -59,7 +66,7 @@ class Query extends React.Component<QueryProps, QueryState> {
   }
 }
 
-export default class Listener extends React.Component<ListenerProps> {
+export default class QueryListener extends React.Component<ListenerProps> {
   render() {
     return (
       <StateContext.Consumer>

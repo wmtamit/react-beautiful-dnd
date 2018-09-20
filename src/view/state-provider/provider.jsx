@@ -13,7 +13,7 @@ type BlockerProps = {|
 class Blocker extends React.Component<BlockerProps> {
   shouldComponentUpdate(props: BlockerProps) {
     if (props.shouldBlock) {
-      console.log('blocking update caused by app state');
+      console.log('blocking update caused by app state update');
       return false;
     }
     return true;
@@ -38,11 +38,18 @@ export default class Provider extends React.Component<
   ProviderProps,
   ProviderState,
 > {
-  unsubscribe: Function = this.props.store.subscribe(this.onStateChange);
-  state: ProviderState = {
-    appState: { phase: 'IDLE' },
-    isAppStateRender: false,
-  };
+  unsubscribe: Function;
+  state: ProviderState;
+
+  constructor(props: ProviderProps, context: any) {
+    super(props, context);
+
+    this.unsubscribe = props.store.subscribe(this.onStateChange);
+    this.state = {
+      appState: { phase: 'IDLE' },
+      isAppStateRender: false,
+    };
+  }
 
   static getDerivedStateFromProps(props: ProviderProps, state: ProviderState) {
     if (state.isAppStateRender) {

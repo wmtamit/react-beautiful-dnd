@@ -11,7 +11,7 @@ import type {
   Props,
 } from './draggable-types';
 import type { Dispatch } from '../../state/store-types';
-import Query from '../store-provider/query';
+import Query from '../state-provider/query';
 import Draggable from './draggable';
 import getSelector from './get-selector';
 import {

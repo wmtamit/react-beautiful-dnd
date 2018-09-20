@@ -35,7 +35,7 @@ import {
   updateDroppableIsEnabled,
   collectionStarting,
 } from '../../state/action-creators';
-import StoreContext from '../store-provider/store-context';
+import Provider from '../state-provider/provider';
 
 type Props = {|
   ...Hooks,
@@ -207,10 +207,6 @@ export default class DragDropContext extends React.Component<Props> {
   onWindowError = (error: Error) => this.onFatalError(error);
 
   render() {
-    return (
-      <StoreContext.Provider value={this.store}>
-        {this.props.children}
-      </StoreContext.Provider>
-    );
+    return <Provider store={this.store}>{this.props.children}</Provider>;
   }
 }

@@ -7,7 +7,7 @@ import type {
   Selector,
   Props,
 } from './droppable-types';
-import Query from '../store-provider/query';
+import Query from '../state-provider/query';
 import Droppable from './droppable';
 import getSelector from './get-selector';
 
