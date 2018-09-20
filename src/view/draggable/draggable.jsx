@@ -290,8 +290,7 @@ export default class Draggable extends Component<Props> {
       children,
     } = this.props;
 
-    console.log('draggable render');
-
+    console.log('rendering draggable', this.props.draggableId);
     const isDraggingOrDropping: boolean = isDragging || Boolean(dropping);
     const child: ?Node = children(
       this.getProvided(
@@ -334,7 +333,6 @@ export default class Draggable extends Component<Props> {
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
     const type: TypeId = this.context[droppableTypeKey];
-    console.log('render draggable', this.props.draggableId);
 
     return (
       <DraggableDimensionPublisher

@@ -26,7 +26,7 @@ import {
   moveByWindowScroll as moveByWindowScrollAction,
 } from '../../state/action-creators';
 
-export default class ConnectedDraggable extends React.Component<OwnProps> {
+export default class ContextDraggable extends React.PureComponent<OwnProps> {
   selector: Selector = getSelector();
 
   static defaultProps: DefaultProps = {
@@ -35,10 +35,14 @@ export default class ConnectedDraggable extends React.Component<OwnProps> {
     disableInteractiveElementBlocking: false,
   };
 
+  // shouldComponentUpdate(props) {
+  //   console.log('ContextDraggable: are props equal?', props === this.props);
+  //   return true;
+  // }
+
   getDispatchProps = memoizeOne(
-    (dispatch: Dispatch): DispatchProps => {
-      console.log('generating action creators');
-      return bindActionCreators(
+    (dispatch: Dispatch): DispatchProps =>
+      bindActionCreators(
         {
           lift: liftAction,
           move: moveAction,
@@ -51,8 +55,7 @@ export default class ConnectedDraggable extends React.Component<OwnProps> {
           dropAnimationFinished: dropAnimationFinishedAction,
         },
         dispatch,
-      );
-    },
+      ),
   );
 
   renderChildren = (mapProps: MapProps, dispatch: Dispatch): ?Node => {
@@ -62,10 +65,12 @@ export default class ConnectedDraggable extends React.Component<OwnProps> {
       ...mapProps,
     };
 
+    console.log('Query rendering Draggable');
     return <Draggable {...props}>{this.props.children}</Draggable>;
   };
 
   render() {
+    console.log('rendering ContextDraggable');
     return (
       <Query selector={this.selector} ownProps={this.props}>
         {this.renderChildren}

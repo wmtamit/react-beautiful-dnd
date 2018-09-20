@@ -12,14 +12,13 @@ type ListenerProps = {|
 
 type QueryProps = {|
   value: Value,
+  isParentRender: boolean,
   ...ListenerProps,
 |};
 
 type QueryState = {|
   hasMapPropsChanged: boolean,
   mapProps: mixed,
-  lastValue: Value,
-  isParentRender: boolean,
 |};
 
 // listening to state updates
@@ -31,26 +30,21 @@ type QueryState = {|
 class Query extends React.Component<QueryProps, QueryState> {
   state: QueryState = {
     hasMapPropsChanged: false,
-    isParentRender: true,
-    lastValue: this.props.value,
     mapProps: this.props.selector(this.props.value.state, this.props.ownProps),
   };
 
   static getDerivedStateFromProps(props: QueryProps, state: QueryState) {
-    const isParentRender: boolean = props.value === state.lastValue;
     const mapProps = props.selector(props.value.state, props.ownProps);
     const hasMapPropsChanged: boolean = mapProps !== state.mapProps;
 
     return {
       hasMapPropsChanged,
-      lastValue: props.value,
-      isParentRender,
       mapProps,
     };
   }
 
   shouldComponentUpdate(props: QueryProps, state: QueryState) {
-    if (state.isParentRender) {
+    if (props.isParentRender) {
       return true;
     }
 
@@ -67,11 +61,24 @@ class Query extends React.Component<QueryProps, QueryState> {
 }
 
 export default class QueryListener extends React.Component<ListenerProps> {
+  isParentRender: boolean = true;
+
+  componentDidUpdate() {
+    console.warn('parent render now false');
+    this.isParentRender = false;
+  }
   render() {
+    this.isParentRender = true;
+    console.log('QueryListener render');
     return (
       <StateContext.Consumer>
         {(value: Value) => (
-          <Query value={value} {...this.props}>
+          // console.log('what is parent render?', this.isParentRender);
+          <Query
+            value={value}
+            isParentRender={this.isParentRender}
+            {...this.props}
+          >
             {this.props.children}
           </Query>
         )}

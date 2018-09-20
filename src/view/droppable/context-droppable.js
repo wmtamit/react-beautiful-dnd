@@ -11,7 +11,7 @@ import Query from '../state-provider/query';
 import Droppable from './droppable';
 import getSelector from './get-selector';
 
-export default class ConnectedDraggable extends React.Component<OwnProps> {
+export default class ContextDroppable extends React.Component<OwnProps> {
   selector: Selector = getSelector();
 
   static defaultProps: DefaultProps = {
@@ -28,6 +28,7 @@ export default class ConnectedDraggable extends React.Component<OwnProps> {
       ...mapProps,
     };
 
+    console.warn('rendering droppable');
     return <Droppable {...props}>{this.props.children}</Droppable>;
   };
 

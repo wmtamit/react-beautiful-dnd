@@ -71,13 +71,16 @@ type QuoteListProps = {|
 class InnerQuoteList extends React.Component<QuoteListProps> {
   shouldComponentUpdate(nextProps: QuoteListProps) {
     if (nextProps.quotes !== this.props.quotes) {
+      console.warn('quote list rendering');
       return true;
     }
 
+    console.warn('quote list NOT rendering');
     return false;
   }
 
   render() {
+    console.error('rendering quote list');
     return this.props.quotes.map((quote: Quote, index: number) => (
       <Draggable key={quote.id} draggableId={quote.id} index={index}>
         {(

@@ -15,11 +15,12 @@ class Blocker extends React.Component<BlockerProps> {
     if (props.shouldAllow) {
       return true;
     }
-    console.log('blocking update');
-    return true;
+    console.log('not rendering root');
+    return false;
   }
 
   render() {
+    console.error('rendering tree');
     return this.props.children;
   }
 }
@@ -35,6 +36,8 @@ type ProviderState = {|
   shouldRenderChildren: boolean,
 |};
 
+const initial: AppState = { phase: 'IDLE' };
+
 export default class Provider extends React.Component<
   ProviderProps,
   ProviderState,
@@ -47,22 +50,26 @@ export default class Provider extends React.Component<
 
     this.unsubscribe = props.store.subscribe(this.onStateChange);
     this.state = {
-      appState: { phase: 'IDLE' },
-      lastAppState: { phase: 'IDLE' },
+      appState: initial,
+      lastAppState: initial,
       shouldRenderChildren: true,
     };
   }
 
-  static getDerivedStateFromProps(props: ProviderProps, state: ProviderState) {
+  static getDerivedStateFromProps(
+    props: ProviderProps,
+    state: ProviderState,
+  ): ProviderState {
     // render must have been caused by parent
     if (state.appState === state.lastAppState) {
       return {
         ...state,
-        shouldRender: true,
+        shouldRenderChildren: true,
       };
     }
 
     // app state change - want to block rendering the tree
+    console.error('App state changing - do not render children');
     return {
       ...state,
       lastAppState: state.appState,

@@ -44,7 +44,7 @@
     "build:dist": "rollup -c",
     "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > dist/react-beautiful-dnd.cjs.js.flow",
     "storybook": "start-storybook -p 9002",
-    "build-storybook": "build-storybook -c .storybook -o site",
+    "build-storybook": "rimraf site && build-storybook -c .storybook -o site",
     "website:start": "cd website && yarn develop",
     "website:build": "cd website && yarn build",
     "prepare": "cd website && yarn",
