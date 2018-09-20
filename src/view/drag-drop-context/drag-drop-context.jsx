@@ -2,7 +2,6 @@
 import React, { type Node } from 'react';
 import { bindActionCreators } from 'redux';
 import invariant from 'tiny-invariant';
-import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal, {
@@ -22,11 +21,10 @@ import type {
 import type { DraggableId, State, Hooks } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
-  storeKey,
-  dimensionMarshalKey,
-  styleContextKey,
-  canLiftContextKey,
-} from '../context-keys';
+  DimensionMarshalContext,
+  StyleContext,
+  CanLiftContext,
+} from './global-context';
 import {
   clean,
   move,
@@ -35,7 +33,7 @@ import {
   updateDroppableIsEnabled,
   collectionStarting,
 } from '../../state/action-creators';
-import Provider from '../state-provider/provider';
+import StateProvider from '../state-provider/provider';
 
 type Props = {|
   ...Hooks,
@@ -133,27 +131,6 @@ export default class DragDropContext extends React.Component<Props> {
       ),
     });
   }
-  // Need to declare childContextTypes without flow
-  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
-  static childContextTypes = {
-    [storeKey]: PropTypes.shape({
-      dispatch: PropTypes.func.isRequired,
-      subscribe: PropTypes.func.isRequired,
-      getState: PropTypes.func.isRequired,
-    }).isRequired,
-    [dimensionMarshalKey]: PropTypes.object.isRequired,
-    [styleContextKey]: PropTypes.string.isRequired,
-    [canLiftContextKey]: PropTypes.func.isRequired,
-  };
-
-  getChildContext(): Context {
-    return {
-      [storeKey]: this.store,
-      [dimensionMarshalKey]: this.dimensionMarshal,
-      [styleContextKey]: this.styleMarshal.styleContext,
-      [canLiftContextKey]: this.canLift,
-    };
-  }
 
   // Providing function on the context for drag handles to use to
   // let them know if they can start a drag or not. This is done
@@ -207,6 +184,16 @@ export default class DragDropContext extends React.Component<Props> {
   onWindowError = (error: Error) => this.onFatalError(error);
 
   render() {
-    return <Provider store={this.store}>{this.props.children}</Provider>;
+    return (
+      <StyleContext.Provider value={this.styleMarshal.styleContext}>
+        <DimensionMarshalContext.Provider value={this.dimensionMarshal}>
+          <CanLiftContext.Provider value={this.canLift}>
+            <StateProvider store={this.store}>
+              {this.props.children}
+            </StateProvider>
+          </CanLiftContext.Provider>
+        </DimensionMarshalContext.Provider>
+      </StyleContext.Provider>
+    );
   }
 }

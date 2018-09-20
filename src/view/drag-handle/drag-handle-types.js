@@ -55,6 +55,14 @@ export type Props = {|
   isDropAnimating: boolean,
   // get the ref of the draggable
   getDraggableRef: () => ?HTMLElement,
+  styleContext: string,
+  // The canLift function is read directly off the context
+  // and will communicate with the store. This is done to avoid
+  // needing to query a property from the store and re-render this component
+  // with that value. By putting it as a function on the context we are able
+  // to avoid re-rendering to pass this information while still allowing
+  // drag-handles to obtain this state if they need it.
+  canLift: (id: DraggableId) => boolean,
   // whether interactive elements should be permitted to start a drag
   canDragInteractiveElements: boolean,
   children: (?DragHandleProps) => Node,

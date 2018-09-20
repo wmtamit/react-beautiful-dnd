@@ -6,10 +6,8 @@ import {
   type Position,
 } from 'css-box-model';
 import memoizeOne from 'memoize-one';
-import PropTypes from 'prop-types';
 import { Component, type Node } from 'react';
 import invariant from 'tiny-invariant';
-import { dimensionMarshalKey } from '../context-keys';
 import { origin } from '../../state/position';
 import type {
   DraggableDescriptor,
@@ -27,14 +25,12 @@ type Props = {|
   type: TypeId,
   index: number,
   getDraggableRef: () => ?HTMLElement,
+  marshal: DimensionMarshal,
   children: Node,
 |};
 
 export default class DraggableDimensionPublisher extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  static contextTypes = {
-    [dimensionMarshalKey]: PropTypes.object.isRequired,
-  };
 
   publishedDescriptor: ?DraggableDescriptor = null;
 
@@ -65,7 +61,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
   );
 
   publish = () => {
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    const marshal: DimensionMarshal = this.props.marshal;
     const descriptor: DraggableDescriptor = this.getMemoizedDescriptor(
       this.props.draggableId,
       this.props.index,
@@ -101,8 +97,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     // Using the previously published id to unpublish. This is to guard
     // against the case where the id dynamically changes. This is not
     // supported during a drag - but it is good to guard against.
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDraggable(this.publishedDescriptor);
+    this.props.marshal.unregisterDraggable(this.publishedDescriptor);
     this.publishedDescriptor = null;
   };
 

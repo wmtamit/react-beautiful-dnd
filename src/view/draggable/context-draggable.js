@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import type {
   MapProps,
   OwnProps,
+  ContextProps,
   DispatchProps,
   DefaultProps,
   Selector,
@@ -25,8 +26,16 @@ import {
   dropAnimationFinished as dropAnimationFinishedAction,
   moveByWindowScroll as moveByWindowScrollAction,
 } from '../../state/action-creators';
+import {
+  DimensionMarshalContext,
+  StyleContext,
+  CanLiftContext,
+  type CanLiftFn,
+} from '../drag-drop-context/global-context';
+import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
+import DroppableContext, { type Context } from '../droppable/droppable-context';
 
-class ContextDraggable extends React.Component<OwnProps> {
+export default class ContextDraggable extends React.Component<OwnProps> {
   selector: Selector = getSelector();
 
   static defaultProps: DefaultProps = {
@@ -34,11 +43,6 @@ class ContextDraggable extends React.Component<OwnProps> {
     // cannot drag interactive elements by default
     disableInteractiveElementBlocking: false,
   };
-
-  // shouldComponentUpdate(props) {
-  //   console.log('ContextDraggable: are props equal?', props === this.props);
-  //   return true;
-  // }
 
   getDispatchProps = memoizeOne(
     (dispatch: Dispatch): DispatchProps =>
@@ -58,10 +62,25 @@ class ContextDraggable extends React.Component<OwnProps> {
       ),
   );
 
-  renderChildren = (mapProps: MapProps, dispatch: Dispatch): ?Node => {
+  renderChildren = (
+    styleContext: string,
+    marshal: DimensionMarshal,
+    canLift: CanLiftFn,
+    droppableContext: Context,
+    mapProps: MapProps,
+    dispatch: Dispatch,
+  ): ?Node => {
+    const context: ContextProps = {
+      styleContext,
+      marshal,
+      canLift,
+      ...droppableContext,
+    };
+
     const props: Props = {
       ...this.props,
       ...this.getDispatchProps(dispatch),
+      ...context,
       ...mapProps,
     };
 
@@ -72,22 +91,34 @@ class ContextDraggable extends React.Component<OwnProps> {
   render() {
     console.error('ContextDraggable: render() called');
     return (
-      <Query selector={this.selector} ownProps={this.props}>
-        {this.renderChildren}
-      </Query>
-    );
-  }
-}
-
-export default class Debug extends React.Component {
-  shouldComponentUpdate() {
-    console.log('DEBUG: YOU SHALL NOT PASS');
-    return false;
-  }
-  render() {
-    console.error('DEBUG: render() (parent of ContextDraggable)');
-    return (
-      <ContextDraggable {...this.props}>{this.props.children}</ContextDraggable>
+      <StyleContext.Consumer>
+        {(styleContext: string) => (
+          <DimensionMarshalContext.Consumer>
+            {(marshal: DimensionMarshal) => (
+              <CanLiftContext.Consumer>
+                {(canLift: CanLiftFn) => (
+                  <DroppableContext.Consumer>
+                    {(droppableContext: Context) => (
+                      <Query selector={this.selector} ownProps={this.props}>
+                        {(mapProps: MapProps, dispatch: Dispatch) =>
+                          this.renderChildren(
+                            styleContext,
+                            marshal,
+                            canLift,
+                            droppableContext,
+                            mapProps,
+                            dispatch,
+                          )
+                        }
+                      </Query>
+                    )}
+                  </DroppableContext.Consumer>
+                )}
+              </CanLiftContext.Consumer>
+            )}
+          </DimensionMarshalContext.Consumer>
+        )}
+      </StyleContext.Consumer>
     );
   }
 }

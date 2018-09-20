@@ -1,7 +1,6 @@
 // @flow
 import React, { Component, Fragment, type Node } from 'react';
 import { type Position, type BoxModel } from 'css-box-model';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { origin } from '../../state/position';
@@ -12,7 +11,6 @@ import type {
   DraggableId,
   DroppableId,
   AutoScrollMode,
-  TypeId,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher';
 import DragHandle from '../drag-handle';
@@ -23,11 +21,6 @@ import type {
 } from '../drag-handle/drag-handle-types';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import Placeholder from '../placeholder';
-import {
-  droppableIdKey,
-  styleContextKey,
-  droppableTypeKey,
-} from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
   Props,
@@ -76,16 +69,7 @@ const getDraggingTransition = (
 export default class Draggable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks;
-  styleContext: string;
   ref: ?HTMLElement = null;
-
-  // Need to declare contextTypes without flow
-  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
-  static contextTypes = {
-    [droppableIdKey]: PropTypes.string.isRequired,
-    [droppableTypeKey]: PropTypes.string.isRequired,
-    [styleContextKey]: PropTypes.string.isRequired,
-  };
 
   constructor(props: Props, context: Object) {
     super(props, context);
@@ -105,7 +89,6 @@ export default class Draggable extends Component<Props> {
     };
 
     this.callbacks = callbacks;
-    this.styleContext = context[styleContextKey];
 
     // Only running this check on creation.
     // Could run it on updates, but I don't think that would be needed
@@ -234,6 +217,7 @@ export default class Draggable extends Component<Props> {
       shouldAnimateDragMovement: boolean,
       dimension: ?DraggableDimension,
       dragHandleProps: ?DragHandleProps,
+      styleContext: string,
     ): Provided => {
       const isDraggingOrDropping: boolean = isDragging || Boolean(dropping);
 
@@ -250,7 +234,7 @@ export default class Draggable extends Component<Props> {
       const provided: Provided = {
         innerRef: this.setRef,
         draggableProps: {
-          'data-react-beautiful-dnd-draggable': this.styleContext,
+          'data-react-beautiful-dnd-draggable': styleContext,
           style: draggableStyle,
           onTransitionEnd: dropping ? this.onMoveEnd : null,
         },
@@ -287,6 +271,7 @@ export default class Draggable extends Component<Props> {
       dimension,
       shouldAnimateDisplacement,
       shouldAnimateDragMovement,
+      styleContext,
       children,
     } = this.props;
 
@@ -303,6 +288,7 @@ export default class Draggable extends Component<Props> {
         shouldAnimateDragMovement,
         dimension,
         dragHandleProps,
+        styleContext,
       ),
       this.getSnapshot(
         isDraggingOrDropping,
@@ -330,18 +316,22 @@ export default class Draggable extends Component<Props> {
       dropping,
       isDragDisabled,
       disableInteractiveElementBlocking,
+      droppableId,
+      droppableType,
+      marshal,
+      canLift,
+      styleContext,
     } = this.props;
-    const droppableId: DroppableId = this.context[droppableIdKey];
-    const type: TypeId = this.context[droppableTypeKey];
 
     return (
       <DraggableDimensionPublisher
         key={draggableId}
         draggableId={draggableId}
         droppableId={droppableId}
-        type={type}
+        type={droppableType}
         index={index}
         getDraggableRef={this.getDraggableRef}
+        marshal={marshal}
       >
         <DragHandle
           draggableId={draggableId}
@@ -350,6 +340,8 @@ export default class Draggable extends Component<Props> {
           isEnabled={!isDragDisabled}
           callbacks={this.callbacks}
           getDraggableRef={this.getDraggableRef}
+          canLift={canLift}
+          styleContext={styleContext}
           // by default we do not allow dragging on interactive elements
           canDragInteractiveElements={disableInteractiveElementBlocking}
         >

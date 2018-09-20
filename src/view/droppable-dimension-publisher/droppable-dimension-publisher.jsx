@@ -1,12 +1,10 @@
 // @flow
 import React, { type Node } from 'react';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
-import { dimensionMarshalKey } from '../context-keys';
 import { origin } from '../../state/position';
 import getScroll from './get-scroll';
 import type {
@@ -33,7 +31,7 @@ type Props = {|
   ignoreContainerClipping: boolean,
   isDropDisabled: boolean,
   getDroppableRef: () => ?HTMLElement,
-  cancel: Function,
+  marshal: DimensionMarshal,
   children: Node,
 |};
 
@@ -71,10 +69,6 @@ export default class DroppableDimensionPublisher extends React.Component<
     this.callbacks = callbacks;
   }
 
-  static contextTypes = {
-    [dimensionMarshalKey]: PropTypes.object.isRequired,
-  };
-
   getClosestScroll = (): Position => {
     const dragging: ?WhileDragging = this.dragging;
     if (!dragging || !dragging.env.closestScrollable) {
@@ -91,8 +85,10 @@ export default class DroppableDimensionPublisher extends React.Component<
     );
 
     const newScroll: Position = { x, y };
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.updateDroppableScroll(this.publishedDescriptor.id, newScroll);
+    this.props.marshal.updateDroppableScroll(
+      this.publishedDescriptor.id,
+      newScroll,
+    );
   });
 
   updateScroll = () => {
@@ -181,8 +177,7 @@ export default class DroppableDimensionPublisher extends React.Component<
 
     // The enabled state of the droppable is changing.
     // We need to let the marshal know incase a drag is currently occurring
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.updateDroppableIsEnabled(
+    this.props.marshal.updateDroppableIsEnabled(
       this.props.droppableId,
       !this.props.isDropDisabled,
     );
@@ -207,7 +202,7 @@ export default class DroppableDimensionPublisher extends React.Component<
   );
 
   publish = () => {
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
+    const marshal: DimensionMarshal = this.props.marshal;
     const descriptor: DroppableDescriptor = this.getMemoizedDescriptor(
       this.props.droppableId,
       this.props.type,
@@ -242,13 +237,8 @@ export default class DroppableDimensionPublisher extends React.Component<
     // Using the previously published id to unpublish. This is to guard
     // against the case where the id dynamically changes. This is not
     // supported during a drag - but it is good to guard against.
-    const marshal: DimensionMarshal = this.context[dimensionMarshalKey];
-    marshal.unregisterDroppable(this.publishedDescriptor);
+    this.props.marshal.unregisterDroppable(this.publishedDescriptor);
     this.publishedDescriptor = null;
-  };
-
-  cancelOnWindowScroll = () => {
-    this.props.cancel();
   };
 
   // Used when Draggables are added or removed from a Droppable during a drag

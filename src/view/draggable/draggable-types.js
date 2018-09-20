@@ -20,6 +20,7 @@ import {
   drop,
   dropAnimationFinished,
 } from '../../state/action-creators';
+import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 import type { DragHandleProps } from '../drag-handle/drag-handle-types';
 
 export type DraggingStyle = {|
@@ -118,6 +119,14 @@ export type MapProps = {|
   combineTargetFor: ?DraggableId,
 |};
 
+export type ContextProps = {|
+  styleContext: string,
+  droppableId: string,
+  droppableType: string,
+  canLift: (id: DraggableId) => boolean,
+  marshal: DimensionMarshal,
+|};
+
 export type OwnProps = {|
   draggableId: DraggableId,
   index: number,
@@ -134,6 +143,7 @@ export type DefaultProps = {|
 export type Props = {|
   ...MapProps,
   ...DispatchProps,
+  ...ContextProps,
   ...OwnProps,
 |};
 

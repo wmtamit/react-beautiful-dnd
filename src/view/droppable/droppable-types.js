@@ -1,6 +1,5 @@
 // @flow
 import { type Node } from 'react';
-import { cancel } from '../../state/action-creators';
 import type {
   DraggableId,
   DroppableId,
@@ -9,6 +8,7 @@ import type {
   Placeholder,
   State,
 } from '../../types';
+import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 
 export type DroppableProps = {|
   // used for shared global styles
@@ -36,6 +36,11 @@ export type MapProps = {|
   placeholder: ?Placeholder,
 |};
 
+export type ContextProps = {|
+  styleContext: string,
+  marshal: DimensionMarshal,
+|};
+
 export type OwnProps = {|
   children: (Provided, StateSnapshot) => ?Node,
   droppableId: DroppableId,
@@ -57,6 +62,7 @@ export type DefaultProps = {|
 export type Props = {|
   ...MapProps,
   ...OwnProps,
+  ...ContextProps,
 |};
 
 // Having issues getting the correct type

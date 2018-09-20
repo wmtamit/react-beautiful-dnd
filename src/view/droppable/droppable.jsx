@@ -1,57 +1,23 @@
 // @flow
 import React, { Component } from 'react';
 import invariant from 'tiny-invariant';
-import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
-import type { DroppableId, TypeId } from '../../types';
 import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
-import {
-  droppableIdKey,
-  droppableTypeKey,
-  styleContextKey,
-} from '../context-keys';
-
-type Context = {
-  [string]: DroppableId | TypeId,
-};
 
 export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  styleContext: string;
   ref: ?HTMLElement = null;
   isPlaceholderMounted: boolean = false;
 
-  // Need to declare childContextTypes without flow
-  static contextTypes = {
-    [styleContextKey]: PropTypes.string.isRequired,
-  };
-
   constructor(props: Props, context: Object) {
     super(props, context);
-
-    this.styleContext = context[styleContextKey];
 
     // a little check to avoid an easy to catch setup
     if (process.env.NODE_ENV !== 'production') {
       invariant(props.droppableId, 'A Droppable requires a droppableId prop');
     }
-  }
-
-  // Need to declare childContextTypes without flow
-  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
-  static childContextTypes = {
-    [droppableIdKey]: PropTypes.string.isRequired,
-    [droppableTypeKey]: PropTypes.string.isRequired,
-  };
-
-  getChildContext(): Context {
-    const value: Context = {
-      [droppableIdKey]: this.props.droppableId,
-      [droppableTypeKey]: this.props.type,
-    };
-    return value;
   }
 
   componentDidMount() {
@@ -139,13 +105,14 @@ export default class Droppable extends Component<Props> {
       ignoreContainerClipping,
       isDraggingOver,
       draggingOverWith,
-      cancel,
+      styleContext,
+      marshal,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
       placeholder: this.getPlaceholder(),
       droppableProps: {
-        'data-react-beautiful-dnd-droppable': this.styleContext,
+        'data-react-beautiful-dnd-droppable': styleContext,
       },
     };
     const snapshot: StateSnapshot = {
@@ -164,7 +131,7 @@ export default class Droppable extends Component<Props> {
         isDropDisabled={isDropDisabled}
         isCombineEnabled={isCombineEnabled}
         getDroppableRef={this.getDroppableRef}
-        cancel={cancel}
+        marshal={marshal}
       >
         {children(provided, snapshot)}
       </DroppableDimensionPublisher>

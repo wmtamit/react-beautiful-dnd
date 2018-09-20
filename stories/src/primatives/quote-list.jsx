@@ -81,11 +81,8 @@ class InnerQuoteList extends React.Component<QuoteListProps> {
 
   render() {
     console.error('InnerQuoteList (WILL RENDER DRAGGABLES)');
-    // return this.props.quotes.map((quote: Quote, index: number) => {
-    console.error('mapping over quotes');
-    const quote = this.props.quotes[0];
-    return (
-      <Draggable draggableId={quote.id} index={0}>
+    return this.props.quotes.map((quote: Quote, index: number) => (
+      <Draggable draggableId={quote.id} index={index}>
         {(
           dragProvided: DraggableProvided,
           dragSnapshot: DraggableStateSnapshot,
@@ -98,8 +95,7 @@ class InnerQuoteList extends React.Component<QuoteListProps> {
           />
         )}
       </Draggable>
-    );
-    // });
+    ));
   }
 }
 
