@@ -290,6 +290,8 @@ export default class Draggable extends Component<Props> {
       children,
     } = this.props;
 
+    console.log('draggable render');
+
     const isDraggingOrDropping: boolean = isDragging || Boolean(dropping);
     const child: ?Node = children(
       this.getProvided(

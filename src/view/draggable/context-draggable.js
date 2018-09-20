@@ -6,13 +6,12 @@ import type {
   MapProps,
   OwnProps,
   DispatchProps,
+  DefaultProps,
   Selector,
   Props,
 } from './draggable-types';
-import type { State } from '../../types';
 import type { Dispatch } from '../../state/store-types';
-import Provider from '../store-provider/provider';
-import { origin } from '../../state/position';
+import Query from '../store-provider/query';
 import Draggable from './draggable';
 import getSelector from './get-selector';
 import {
@@ -30,9 +29,16 @@ import {
 export default class ConnectedDraggable extends React.Component<OwnProps> {
   selector: Selector = getSelector();
 
+  static defaultProps: DefaultProps = {
+    isDragDisabled: false,
+    // cannot drag interactive elements by default
+    disableInteractiveElementBlocking: false,
+  };
+
   getDispatchProps = memoizeOne(
-    (dispatch: Dispatch): DispatchProps =>
-      bindActionCreators(
+    (dispatch: Dispatch): DispatchProps => {
+      console.log('generating action creators');
+      return bindActionCreators(
         {
           lift: liftAction,
           move: moveAction,
@@ -45,7 +51,8 @@ export default class ConnectedDraggable extends React.Component<OwnProps> {
           dropAnimationFinished: dropAnimationFinishedAction,
         },
         dispatch,
-      ),
+      );
+    },
   );
 
   renderChildren = (mapProps: MapProps, dispatch: Dispatch): ?Node => {
@@ -60,9 +67,9 @@ export default class ConnectedDraggable extends React.Component<OwnProps> {
 
   render() {
     return (
-      <Provider selector={this.selector} ownProps={this.props}>
+      <Query selector={this.selector} ownProps={this.props}>
         {this.renderChildren}
-      </Provider>
+      </Query>
     );
   }
 }

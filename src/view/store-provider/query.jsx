@@ -7,43 +7,40 @@ import { type State } from '../../types';
 import { type Store, type Dispatch } from '../../state/store-types';
 
 type Props = {|
-  children: <MapProps>(mapProps: MapProps, dispatch: Dispatch) => Node,
+  defaultState: State,
+  children: <MapProps>(mapProps: MapProps, dispatch?: Dispatch) => Node,
   selector: <MapProps, OwnProps>(state: State, ownProps: OwnProps) => MapProps,
   ownProps: mixed,
 |};
 
 type QueryState = {|
   mapProps: mixed,
+  lastState: State,
 |};
-
-// Temp hack
-const defaultMapProps: MapProps = {
-  isDragging: false,
-  dropping: null,
-  offset: { x: 0, y: 0 },
-  shouldAnimateDragMovement: false,
-  // This is set to true by default so that as soon as Draggable
-  // needs to be displaced it can without needing to change this flag
-  shouldAnimateDisplacement: true,
-  // these properties are only populated when the item is dragging
-  dimension: null,
-  draggingOver: null,
-  combineWith: null,
-  combineTargetFor: null,
-};
 
 export default class Query extends React.Component<Props, QueryState> {
   store: ?Store;
   unsubscribe: Function;
 
+  static defaultProps = {
+    defaultState: { phase: 'IDLE' },
+  };
+
   state: QueryState = {
-    mapProps: defaultMapProps,
+    lastState: this.props.defaultState,
+    mapProps: this.props.selector(this.props.defaultState, this.props.ownProps),
   };
 
   onStateChange = () => {
     const store: ?Store = this.store;
     invariant(store);
     const state: State = store.getState();
+
+    // no need to run the selector
+    if (state === this.state.lastState) {
+      return;
+    }
+
     const mapProps = this.props.selector(state, this.props.ownProps);
     // no change
     if (this.state.mapProps === mapProps) {
@@ -52,7 +49,13 @@ export default class Query extends React.Component<Props, QueryState> {
 
     this.setState({
       mapProps,
+      lastState: state,
     });
+  };
+
+  renderChildren = (): Node => {
+    invariant(this.store, 'Cannot render children without a store');
+    return this.props.children(this.state.mapProps, this.store.dispatch);
   };
 
   register = (store: ?Store): Node => {
@@ -65,18 +68,14 @@ export default class Query extends React.Component<Props, QueryState> {
       );
 
       // this can happen if a parent renders
-      return this.props.children(this.state.mapProps, this.store.dispatch);
+      return this.renderChildren();
     }
 
     // register store
     this.store = store;
-    // get initial map props
     this.unsubscribe = store.subscribe(this.onStateChange);
 
-    // TODO: put this into state</MapProps>
-    const state: State = store.getState();
-    const mapProps = this.props.selector(state, this.props.ownProps);
-    return this.props.children(mapProps, store.dispatch);
+    return this.renderChildren();
   };
 
   componentWillUnmount() {

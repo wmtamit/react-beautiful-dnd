@@ -292,8 +292,11 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
   ): any => {
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
+      console.log('before start');
       publisher.beforeStart(critical);
+      console.log('next');
       next(action);
+      console.log('start');
       publisher.start(critical);
       return;
     }

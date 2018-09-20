@@ -26,10 +26,6 @@ export type StateSnapshot = {|
   draggingOverWith: ?DraggableId,
 |};
 
-export type DispatchProps = {|
-  cancel: typeof cancel,
-|};
-
 export type MapProps = {|
   isDraggingOver: boolean,
   // The id of the draggable that is dragging over
@@ -60,7 +56,6 @@ export type DefaultProps = {|
 
 export type Props = {|
   ...MapProps,
-  ...DispatchProps,
   ...OwnProps,
 |};
 

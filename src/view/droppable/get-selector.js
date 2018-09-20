@@ -1,13 +1,8 @@
 // @flow
-import { type Node } from 'react';
-import { connect } from 'react-redux';
+
 import memoizeOne from 'memoize-one';
-import { storeKey } from '../context-keys';
-import Droppable from './droppable';
-import isStrictEqual from '../is-strict-equal';
 import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
-import { cancel as cancelAction } from '../../state/action-creators';
 import type {
   State,
   DroppableId,
@@ -16,13 +11,7 @@ import type {
   DraggableDimension,
   Placeholder,
 } from '../../types';
-import type {
-  MapProps,
-  DispatchProps,
-  OwnProps,
-  DefaultProps,
-  Selector,
-} from './droppable-types';
+import type { MapProps, OwnProps, Selector } from './droppable-types';
 
 const defaultMapProps: MapProps = {
   isDraggingOver: false,
@@ -30,9 +19,7 @@ const defaultMapProps: MapProps = {
   placeholder: null,
 };
 
-// Returning a function to ensure each
-// Droppable gets its own selector
-export const makeMapStateToProps = (): Selector => {
+export default (): Selector => {
   const getMapProps = memoizeOne(
     (
       isDraggingOver: boolean,
@@ -90,36 +77,3 @@ export const makeMapStateToProps = (): Selector => {
 
   return selector;
 };
-
-// Leaning heavily on the default shallow equality checking
-// that `connect` provides.
-// It avoids needing to do it own within `Droppable`
-const ConnectedDroppable: OwnProps => Node = (connect(
-  // returning a function so each component can do its own memoization
-  makeMapStateToProps,
-  null,
-  // mergeProps - using default
-  null,
-  {
-    // Using our own store key.
-    // This allows consumers to also use redux
-    // Note: the default store key is 'store'
-    storeKey,
-    // Default value, but being really clear
-    pure: true,
-    // When pure, compares the result of mapStateToProps to its previous value.
-    // Default value: shallowEqual
-    // Switching to a strictEqual as we return a memoized object on changes
-    areStatePropsEqual: isStrictEqual,
-  },
-): any)(Droppable);
-
-ConnectedDroppable.defaultProps = ({
-  type: 'DEFAULT',
-  direction: 'vertical',
-  isDropDisabled: false,
-  isCombineEnabled: false,
-  ignoreContainerClipping: false,
-}: DefaultProps);
-
-export default ConnectedDroppable;

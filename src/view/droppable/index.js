@@ -1,2 +1,2 @@
 // @flow
-export { default } from './connected-droppable';
+export { default } from './context-droppable';
