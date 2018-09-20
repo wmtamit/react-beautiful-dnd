@@ -1,9 +1,13 @@
 // @flow
 import React from 'react';
-import type { State, IdleState } from '../../types';
+import type { State } from '../../types';
+import type { Dispatch } from '../../state/store-types';
 
-const idle: IdleState = { phase: 'IDLE' };
+export type Value = {|
+  state: State,
+  dispatch: Dispatch,
+|};
 
-const StateContext = React.createContext<State>(idle);
+const StateContext = React.createContext<Value>();
 
 export default StateContext;
