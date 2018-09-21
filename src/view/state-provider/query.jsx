@@ -51,19 +51,13 @@ class GetMapProps extends React.Component<QueryProps, QueryState> {
     // }
 
     if (state.hasMapPropsChanged) {
-      console.log('map props changed', state.mapProps);
       return true;
     }
 
-    console.log('NO map prop change: should not render children');
     return false;
   }
 
   render() {
-    console.warn(
-      'GetMapProps: render() called (responding to state change)',
-      this.props.ownProps,
-    );
     return this.props.children(this.state.mapProps, this.props.value.dispatch);
   }
 }
@@ -76,10 +70,6 @@ export default class Query extends React.Component<ListenerProps> {
   }
   render() {
     this.isParentRender = true;
-    console.error(
-      'Query: render() called (parent render)',
-      this.props.ownProps,
-    );
     return (
       <StateContext.Consumer>
         {(value: Value) => (

@@ -120,8 +120,6 @@ export default class Droppable extends Component<Props> {
       draggingOverWith,
     };
 
-    console.error('droppable rendering');
-
     return (
       <DroppableDimensionPublisher
         droppableId={droppableId}

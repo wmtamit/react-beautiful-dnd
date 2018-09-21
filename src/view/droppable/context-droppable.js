@@ -49,12 +49,10 @@ export default class ContextDroppable extends React.Component<OwnProps> {
       marshal,
     };
 
-    console.warn('ContextDroppable: child rendering (UnconnectedDroppable)');
     return <Droppable {...props}>{this.props.children}</Droppable>;
   };
 
   render() {
-    console.error('ContextDroppable: render() called');
     const context: Context = this.getContext(
       this.props.droppableId,
       this.props.type,

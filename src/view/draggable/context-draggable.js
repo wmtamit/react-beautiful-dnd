@@ -84,12 +84,10 @@ export default class ContextDraggable extends React.Component<OwnProps> {
       ...mapProps,
     };
 
-    console.warn('ContextDraggable: rendering child (UnconnectedDraggable)');
     return <Draggable {...props}>{this.props.children}</Draggable>;
   };
 
   render() {
-    console.error('ContextDraggable: render() called');
     return (
       <StyleContext.Consumer>
         {(styleContext: string) => (
@@ -98,20 +96,23 @@ export default class ContextDraggable extends React.Component<OwnProps> {
               <CanLiftContext.Consumer>
                 {(canLift: CanLiftFn) => (
                   <DroppableContext.Consumer>
-                    {(droppableContext: Context) => (
-                      <Query selector={this.selector} ownProps={this.props}>
-                        {(mapProps: MapProps, dispatch: Dispatch) =>
-                          this.renderChildren(
-                            styleContext,
-                            marshal,
-                            canLift,
-                            droppableContext,
-                            mapProps,
-                            dispatch,
-                          )
-                        }
-                      </Query>
-                    )}
+                    {(droppableContext: Context) => {
+                      console.log('parent of query called');
+                      return (
+                        <Query selector={this.selector} ownProps={this.props}>
+                          {(mapProps: MapProps, dispatch: Dispatch) =>
+                            this.renderChildren(
+                              styleContext,
+                              marshal,
+                              canLift,
+                              droppableContext,
+                              mapProps,
+                              dispatch,
+                            )
+                          }
+                        </Query>
+                      );
+                    }}
                   </DroppableContext.Consumer>
                 )}
               </CanLiftContext.Consumer>

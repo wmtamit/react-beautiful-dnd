@@ -71,18 +71,15 @@ type QuoteListProps = {|
 class InnerQuoteList extends React.Component<QuoteListProps> {
   shouldComponentUpdate(nextProps: QuoteListProps) {
     if (nextProps.quotes !== this.props.quotes) {
-      console.error('InnerQuoteList rendering');
       return true;
     }
 
-    console.warn('InnerQuoteList NOT rendering (should STOP render down)');
     return false;
   }
 
   render() {
-    console.error('InnerQuoteList (WILL RENDER DRAGGABLES)');
     return this.props.quotes.map((quote: Quote, index: number) => (
-      <Draggable draggableId={quote.id} index={index}>
+      <Draggable draggableId={quote.id} index={index} key={quote.id}>
         {(
           dragProvided: DraggableProvided,
           dragSnapshot: DraggableStateSnapshot,
@@ -109,7 +106,6 @@ class InnerList extends React.Component<InnerListProps> {
   render() {
     const { quotes, dropProvided } = this.props;
     const title = this.props.title ? <Title>{this.props.title}</Title> : null;
-    console.log('rendering inner list');
 
     return (
       <Container>

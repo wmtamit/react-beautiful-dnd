@@ -15,12 +15,10 @@ class Blocker extends React.Component<BlockerProps> {
     if (props.shouldAllow) {
       return true;
     }
-    console.log('not rendering tree');
     return false;
   }
 
   render() {
-    console.error('rendering tree');
     return this.props.children;
   }
 }
@@ -69,7 +67,6 @@ export default class Provider extends React.Component<
     }
 
     // app state change - want to block rendering the tree
-    console.error('App state changing - do not render children');
     return {
       ...state,
       lastAppState: state.appState,
