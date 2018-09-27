@@ -7,14 +7,10 @@ import StateContext, { type Value } from './state-context';
 
 type BlockerProps = {|
   children: Node,
-  shouldAllow: boolean,
 |};
 
 class Blocker extends React.Component<BlockerProps> {
-  shouldComponentUpdate(props: BlockerProps) {
-    if (props.shouldAllow) {
-      return true;
-    }
+  shouldComponentUpdate() {
     return false;
   }
 
@@ -29,49 +25,22 @@ type ProviderProps = {|
 |};
 
 type ProviderState = {|
-  lastAppState: AppState,
   appState: AppState,
-  shouldRenderChildren: boolean,
 |};
-
-const initial: AppState = { phase: 'IDLE' };
 
 export default class Provider extends React.Component<
   ProviderProps,
   ProviderState,
 > {
   unsubscribe: Function;
-  state: ProviderState;
+  state: ProviderState = {
+    appState: { phase: 'IDLE' },
+  };
 
   constructor(props: ProviderProps, context: any) {
     super(props, context);
 
     this.unsubscribe = props.store.subscribe(this.onStateChange);
-    this.state = {
-      appState: initial,
-      lastAppState: initial,
-      shouldRenderChildren: true,
-    };
-  }
-
-  static getDerivedStateFromProps(
-    props: ProviderProps,
-    state: ProviderState,
-  ): ProviderState {
-    // render must have been caused by parent
-    if (state.appState === state.lastAppState) {
-      return {
-        ...state,
-        shouldRenderChildren: true,
-      };
-    }
-
-    // app state change - want to block rendering the tree
-    return {
-      ...state,
-      lastAppState: state.appState,
-      shouldRenderChildren: false,
-    };
   }
 
   componentWillUnmount() {
@@ -101,10 +70,9 @@ export default class Provider extends React.Component<
       this.props.store.dispatch,
     );
 
-    const shouldAllow: boolean = this.state.shouldRenderChildren;
     return (
       <StateContext.Provider value={value}>
-        <Blocker shouldAllow={shouldAllow}>{this.props.children}</Blocker>
+        <Blocker>{this.props.children}</Blocker>
       </StateContext.Provider>
     );
   }

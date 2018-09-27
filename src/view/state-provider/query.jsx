@@ -44,12 +44,6 @@ class GetMapProps extends React.Component<QueryProps, QueryState> {
   }
 
   shouldComponentUpdate(props: QueryProps, state: QueryState) {
-    // TODO: turn back on
-    // if (props.isParentRender) {
-    //   console.log('is parent render');
-    //   return true;
-    // }
-
     if (state.hasMapPropsChanged) {
       return true;
     }
@@ -63,22 +57,12 @@ class GetMapProps extends React.Component<QueryProps, QueryState> {
 }
 
 export default class Query extends React.Component<ListenerProps> {
-  isParentRender: boolean = true;
-
-  componentDidUpdate() {
-    this.isParentRender = false;
-  }
   render() {
-    this.isParentRender = true;
     return (
       <StateContext.Consumer>
         {(value: Value) => (
           // console.log('what is parent render?', this.isParentRender);
-          <GetMapProps
-            value={value}
-            isParentRender={this.isParentRender}
-            {...this.props}
-          >
+          <GetMapProps value={value} {...this.props}>
             {this.props.children}
           </GetMapProps>
         )}
