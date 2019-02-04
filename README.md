@@ -6,10 +6,7 @@ Beautiful and accessible drag and drop for lists with [`React`](https://facebook
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/atlassian/react-beautiful-dnd/master.svg)](https://circleci.com/gh/atlassian/react-beautiful-dnd/tree/master)
 [![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
-[![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd)
-[![Downloads per month](https://img.shields.io/npm/dm/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/react-beautiful-dnd)
-[![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/)
+[![Downloads per month](https://img.shields.io/npm/dm/react-beautiful-dnd.svg)](https://spectrum.chat/react-beautiful-dnd)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ![quote application example](https://raw.githubusercontent.com/alexreardon/files/master/resources/website-board.gif?raw=true)
@@ -1166,6 +1163,9 @@ Disabling the warnings will not stop a drag from being aborted in the case of an
 Please see our [types guide](/docs/guides/types.md)
 
 ## Community ❤️👋
+
+(https://www.npmjs.com/package/react-beautiful-dnd)
+[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)]
 
 - [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. - Simple Trello - A simple cloning version of Trello, using React ecosystem.
   - [Demo](https://simple-trello.netlify.com/)
