@@ -3,6 +3,7 @@
 # react-beautiful-dnd
 
 Beautiful and accessible drag and drop for lists with [`React`](https://facebook.github.io/react/)
+it's very healpful for beginer level developer
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/atlassian/react-beautiful-dnd/master.svg)](https://circleci.com/gh/atlassian/react-beautiful-dnd/tree/master)
 [![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
